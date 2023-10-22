@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { autoCommit, getDiff } from './libs/sourceControl';
+import { SourceControlProvider, addAllFiles, autoCommit, getDiff } from './libs/sourceControl';
 import { openAITest } from './libs/openai';
 
 // This method is called when your extension is activated
@@ -13,7 +13,9 @@ export function activate(context: vscode.ExtensionContext) {
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('automit.helloWorld', async () => {
+	const controller = new SourceControlProvider();
+	controller.registerCommands();
+	let disposable = vscode.commands.registerCommand('automit.automit', async () => {
 		// The code you place here will be executed every time your command is executed
 		// Display a message box to the user
 
@@ -26,13 +28,23 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 			let comp = await openAITest(diff);
 
-			autoCommit(comp.choices[0].message.content as string);
+			// ask user if they want to commit with the given message
+			// if yes, commit
+			// if no, do nothing
+
+			vscode.window.showInformationMessage(`Commit with message: "${comp.choices[0].message.content}"?`, 'Yes', 'No').then((selection) => {
+				if(selection === 'Yes'){
+					addAllFiles();
+					autoCommit(comp.choices[0].message.content as string);
+				}
+			});
 
 		}
 
 	});
 
 	context.subscriptions.push(disposable);
+	context.subscriptions.push(controller);
 }
 
 // This method is called when your extension is deactivated

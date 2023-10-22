@@ -14,8 +14,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "automit.helloWorld",
-        "title": "Hello World"
+        "command": "automit.automit",
+        "title": "Generate commit message"
       }
     ]
   },

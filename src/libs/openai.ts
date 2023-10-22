@@ -20,8 +20,8 @@ export async function openAITest(diff: String): Promise<ChatCompletion> {
 
 
   // terminal.sendText(`${JSON.stringify(completion.choices[0])}`, false);
-  outputChannel.appendLine(`${JSON.stringify(completion.choices[0])}`);
-  outputChannel.show();
+  // outputChannel.appendLine(`${JSON.stringify(completion.choices[0])}`);
+  // outputChannel.show();
 
   return completion;
 }
