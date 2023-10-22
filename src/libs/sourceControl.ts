@@ -1,22 +1,40 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
+import { openAITest } from './openai';
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 
 
 export class SourceControlProvider {
   sourceControl: any;
+  // customButton: HTMLButtonElement;
+  // customButton: HTMLButtonElement;
 
   constructor() {
-    this.sourceControl = vscode.scm.createSourceControl('my-source-control', 'My Source Control');
+    // enable webview
+    this.sourceControl = vscode.scm.createSourceControl('my-source-control', 'Automit');
     if (!this.sourceControl) {
       throw new Error('Failed to create source control.');
     }
     this.sourceControl.quickDiffProvider = this as any;
+
+    // this.customButton = document.createElement('button');
+    // this.customButton.textContent = 'Custom Button';
+    // this.customButton.className = 'custom-button'; // Add a custom CSS class if needed
+
+    // // Attach a click event handler to the button
+    // this.customButton.addEventListener('click', () => {
+    //   // Handle button click event
+    //   vscode.commands.executeCommand('extension.mySourceControlCommand');
+    // });
+
+    // // Append the button to the source control view
+    // this.sourceControl.root = this.customButton;
   }
 
+
   get label() {
-    return 'My Source Control';
+    return 'Automit';
   }
 
   async provideOriginalResource(uri: String) {
@@ -29,13 +47,49 @@ export class SourceControlProvider {
   }
 
   registerCommands() {
-    // Define a command that will be triggered by the new button
-    const myCommand = vscode.commands.registerCommand('extension.mySourceControlCommand', () => {
-      vscode.window.showInformationMessage('Button Clicked!');
+    const button = document.createElement('button');
+    button.className = 'blue-button'; // Apply the custom CSS class
+    button.textContent = 'My Blue Button';
+
+    // Define a command that will be triggered by the button
+    button.addEventListener('click', () => {
+      vscode.commands.executeCommand('extension.mySourceControlCommand');
     });
 
+    // Append the button to the source control provider's view
+    this.sourceControl.root = button;
+    // Define a command that will be triggered by the new button
+
+    let sourceControlButton = vscode.commands.registerCommand('automit.sourceControlCommand', async () => {
+		// The code you place here will be executed every time your command is executed
+		// Display a message box to the user
+
+		const diff = await getDiff();
+		if(diff !== undefined){
+			// check if diff is empty
+			if(diff.length === 0){
+				vscode.window.showInformationMessage('No changes to commit');
+				return;
+			}
+			let comp = await openAITest(diff);
+
+			// ask user if they want to commit with the given message
+			// if yes, commit
+			// if no, do nothing
+
+			vscode.window.showInformationMessage(`Commit with message: "${comp.choices[0].message.content}"?`, 'Yes', 'No').then((selection) => {
+				if(selection === 'Yes'){
+					addAllFiles();
+					autoCommit(comp.choices[0].message.content as string);
+				}
+			});
+
+		}
+
+	});
+
     // Register the command
-    this.sourceControl.commands = [myCommand];
+    this.sourceControl.commands = [sourceControlButton];
   }
 
   dispose() {

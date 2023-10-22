@@ -9,14 +9,41 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished",
+    "onView:automit-sidebar"
+  ],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "automit-sidebar",
+          "title": "Automit",
+          "icon": "media/git-commit.svg"
+        }
+      ]
+    },
+    "views": {
+      "automit-sidebar": [
+        {
+          "type": "webview",
+          "id": "automit-sidebar",
+          "name": "Automit",
+          "icon": "media/git-commit.svg",
+          "contextualTitle": "Automit"
+        }
+      ]},
     "commands": [
       {
         "command": "automit.automit",
         "title": "Generate commit message"
+      },
+      {
+        "command": "automit.SourceControlCommand",
+        "title": "Start Automit"
       }
+      
     ]
   },
   "scripts": {
