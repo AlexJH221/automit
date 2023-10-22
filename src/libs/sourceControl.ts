@@ -32,7 +32,6 @@ export function autoCommit(message: string) {
 
     // Run the Git commit command in the terminal
     // terminal.sendText(`git commit -m "Auto commit: ${fileUri.fsPath}"`);
-    addAllFiles();
     terminal.sendText(`git commit -m "${message}"`);
     terminal.show();
   } else {
@@ -42,46 +41,9 @@ export function autoCommit(message: string) {
 
 
 
-// export async function getDiff() {
-//   let terminal;
-//   if (vscode.window.activeTerminal) {
-//     terminal = vscode.window.activeTerminal;
-//   }
-//   else {
-//     terminal = vscode.window.createTerminal('OpenAI');
-//   }
-//   terminal.sendText(`git diff >> dif `);
-
-//   const filePath = vscode.workspace.rootPath + '/dif';
-
-//   console.log("dif path: ", filePath);
-
-//   if (!fs.existsSync(filePath)) {
-//     vscode.window.showErrorMessage('The diff file does not exist.');
-//     return;
-//   }
-
-//   // Read the contents of the .diff file
-//   fs.promises.readFile(filePath, 'utf8')
-//     .then(data => {
-//       const diffContents = data.toString();
-//       //show the contents of the diff file in the output channel
-//       vscode.window.showInformationMessage(diffContents);
-//       // Now you have the .diff file contents in the 'diffContents' variable
-//       // You can use or manipulate this data as needed.
-//     })
-//     .catch(error => {
-//       vscode.window.showErrorMessage('Error reading the .diff file: ' + error.message);
-//     });
-
-//     //clean up code
-//   terminal.sendText(`rm dif`);
-// }
-
-
-
 
 export async function getDiff(): Promise<String | undefined> {
+  addAllFiles();
   let terminal;
 
   if (vscode.window.activeTerminal) {
@@ -110,7 +72,7 @@ export async function getDiff(): Promise<String | undefined> {
     // You can use or manipulate this data as needed.
 
     // Clean up: Remove the .diff file
-    terminal.sendText(`rm dif`);
+    // terminal.sendText(`rm dif`);
     return diffContents;
   } catch (error: any) {
     vscode.window.showErrorMessage('Error reading the .diff file: ' + error.message);

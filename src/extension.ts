@@ -21,7 +21,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 		const diff = await getDiff();
 		if(diff !== undefined){
-			await openAITest(diff);
+			// check if diff is empty
+			if(diff.length === 0){
+				vscode.window.showInformationMessage('No changes to commit');
+				return;
+			}
+			let comp = await openAITest(diff);
+			// autoCommit(comp.choices[0].message.content as string);
 		}
 
 	});
