@@ -52,7 +52,7 @@ export async function getDiff(): Promise<String | undefined> {
     terminal = vscode.window.createTerminal('OpenAI');
   }
 
-  terminal.sendText(`git diff >> dif`);
+  terminal.sendText(`git diff > dif`);
 
   const filePath = vscode.workspace.rootPath + '/dif';
 
@@ -72,7 +72,7 @@ export async function getDiff(): Promise<String | undefined> {
     // You can use or manipulate this data as needed.
 
     // Clean up: Remove the .diff file
-    // terminal.sendText(`rm dif`);
+    terminal.sendText(`rm dif`);
     return diffContents;
   } catch (error: any) {
     vscode.window.showErrorMessage('Error reading the .diff file: ' + error.message);
