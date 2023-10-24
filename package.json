@@ -1,7 +1,8 @@
 {
   "name": "automit",
-  "displayName": "automit",
+  "displayName": "Automit",
   "description": "AI generated commit messags",
+  "publisher": "MunozVscodeExtensions",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.83.0"
@@ -15,25 +16,6 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "automit-sidebar",
-          "title": "Automit",
-          "icon": "media/git-commit.svg"
-        }
-      ]
-    },
-    "views": {
-      "automit-sidebar": [
-        {
-          "type": "webview",
-          "id": "automit-sidebar",
-          "name": "Automit",
-          "icon": "media/git-commit.svg",
-          "contextualTitle": "Automit"
-        }
-      ]},
     "commands": [
       {
         "command": "automit.automit",
@@ -68,5 +50,9 @@
   },
   "dependencies": {
     "openai": "^4.12.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AlexJH221/automit"
   }
 }

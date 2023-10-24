@@ -5,6 +5,19 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 
 
+export function getAPIKey(context: vscode.ExtensionContext) {
+  // Get the API key from the global state
+  const apiKey = context.globalState.get('automit.apiKey') as string;
+  return apiKey;
+}
+
+export async function saveAPIKey(context: vscode.ExtensionContext,apiKey: string) {
+  // Save the API key to the global state
+  await context.globalState.update('automit.apiKey', apiKey);
+}
+
+
+
 export class SourceControlProvider {
   sourceControl: any;
   // customButton: HTMLButtonElement;
@@ -46,7 +59,7 @@ export class SourceControlProvider {
     return null;
   }
 
-  registerCommands() {
+  registerCommands( context: vscode.ExtensionContext) {
     const button = document.createElement('button');
     button.className = 'blue-button'; // Apply the custom CSS class
     button.textContent = 'My Blue Button';
@@ -71,7 +84,7 @@ export class SourceControlProvider {
 				vscode.window.showInformationMessage('No changes to commit');
 				return;
 			}
-			let comp = await openAITest(diff);
+			let comp = await openAITest(context, diff);
 
 			// ask user if they want to commit with the given message
 			// if yes, commit
@@ -132,11 +145,27 @@ export function autoCommit(message: string) {
     // terminal.sendText(`git commit -m "Auto commit: ${fileUri.fsPath}"`);
     terminal.sendText(`git commit -m "${message}"`);
     terminal.show();
+    terminal.sendText(`git push`);
+    terminal.show();
   } else {
     vscode.window.showWarningMessage('Open a file to commit.');
   }
 }
 
+export function autoPush(){
+  // Get the file's URI and open a terminal
+  let terminal;
+  if(vscode.window.activeTerminal){
+    terminal = vscode.window.activeTerminal;
+  }
+  else{
+    terminal = vscode.window.createTerminal('Git Commit');
+  }
+
+  // Run the Git commit command in the terminal
+  terminal.sendText(`git push`);
+  terminal.show();
+}
 
 
 
@@ -170,7 +199,7 @@ export async function getDiff(): Promise<String | undefined> {
     // You can use or manipulate this data as needed.
 
     // Clean up: Remove the .diff file
-    terminal.sendText(`rm dif`);
+    // terminal.sendText(`rm dif`);
     return diffContents;
   } catch (error: any) {
     vscode.window.showErrorMessage('Error reading the .diff file: ' + error.message);
