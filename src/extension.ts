@@ -1,20 +1,10 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { SourceControlProvider, addAllFiles, autoCommit, getDiff, getAPIKey, saveAPIKey, autoPush } from './libs/sourceControl';
+import {  addAllFiles, autoCommit, getDiff,  } from './libs/sourceControl';
 import { openAITest } from './libs/openai';
-import { openWebView } from './libs/webview';
-import { SidebarProvider } from './SidebarProvider';
-import { get } from 'http';
+import { getAPIKey, promptForAPIKey, saveAPIKey } from './libs/helpers';
 
-
-async function promptForAPIKey() {
-  const apiKey = await vscode.window.showInputBox({
-    prompt: 'Please enter your API key',
-    placeHolder: 'API key',
-  });
-  return apiKey;
-}
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -32,19 +22,9 @@ export function activate(context: vscode.ExtensionContext) {
 	// check if api key is already saved
 	let key = getAPIKey(context);
 
-	  if (!key) {
+	if (!key) {
     vscode.window.showInformationMessage('No API key found. Please enter your API key.');
-
-    promptForAPIKey().then((apiKey) => {
-      if (apiKey) {
-        // Save the API key.
-        saveAPIKey(context, apiKey);
-
-        vscode.window.showInformationMessage('API key saved successfully.');
-      } else {
-        vscode.window.showWarningMessage('API key was not provided.');
-      }
-    });
+    promptForAPIKey(context);
   }
 
 	// init webview
@@ -52,17 +32,6 @@ export function activate(context: vscode.ExtensionContext) {
 	// const controller = new SourceControlProvider();
 	// controller.registerCommands();
 	let disposable = vscode.commands.registerCommand('automit.automit', async () => {
-
-
-		// const sidebarProvider = new SidebarProvider(context.extensionUri);
-		// context.subscriptions.push(
-		// 	vscode.window.registerWebviewViewProvider(
-		// 		"automit-sidebar",
-		// 		sidebarProvider
-		// 	)
-		// );
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
 
 		const diff = await getDiff();
 		if(diff !== undefined){

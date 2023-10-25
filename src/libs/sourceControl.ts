@@ -5,16 +5,7 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 
 
-export function getAPIKey(context: vscode.ExtensionContext) {
-  // Get the API key from the global state
-  const apiKey = context.globalState.get('automit.apiKey') as string;
-  return apiKey;
-}
 
-export async function saveAPIKey(context: vscode.ExtensionContext,apiKey: string) {
-  // Save the API key to the global state
-  await context.globalState.update('automit.apiKey', apiKey);
-}
 
 
 
