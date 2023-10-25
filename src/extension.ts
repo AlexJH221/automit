@@ -40,6 +40,13 @@ export function activate(context: vscode.ExtensionContext) {
 				vscode.window.showInformationMessage('No changes to commit');
 				return;
 			}
+
+			const key = getAPIKey(context);
+			if(!key){
+				vscode.window.showInformationMessage('No API key found. Please enter your API key.');
+				promptForAPIKey(context);
+			}
+
 			let comp = await openAITest(context, diff);
 
 			// ask user if they want to commit with the given message
