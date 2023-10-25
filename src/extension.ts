@@ -89,8 +89,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 	});
 
+	let newKey = vscode.commands.registerCommand('automit.newKey', async () => {
+		promptForAPIKey(context);
+	});
 	context.subscriptions.push(disposable);
-	// context.subscriptions.push(controller);
+	context.subscriptions.push(newKey);
 }
 
 // This method is called when your extension is deactivated

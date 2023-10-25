@@ -1,112 +1,149 @@
 diff --git a/dif b/dif
-index 37ed69b..e69de29 100644
+index 36c5f88..e69de29 100644
 --- a/dif
 +++ b/dif
-@@ -1,89 +0,0 @@
+@@ -1,112 +0,0 @@
+-diff --git a/dif b/dif
+-index 37ed69b..e69de29 100644
+---- a/dif
+-+++ b/dif
+-@@ -1,89 +0,0 @@
+--diff --git a/src/extension.ts b/src/extension.ts
+--index 9bdeee3..dd14319 100644
+----- a/src/extension.ts
+--+++ b/src/extension.ts
+--@@ -1,21 +1,11 @@
+-- // The module 'vscode' contains the VS Code extensibility API
+-- // Import the module and reference it with the alias vscode in your code below
+-- import * as vscode from 'vscode';
+---import { SourceControlProvider, addAllFiles, autoCommit, getDiff, getAPIKey, saveAPIKey, autoPush } from './libs/sourceControl';
+--+import {  addAllFiles, autoCommit, getDiff,  } from './libs/sourceControl';
+-- import { openAITest } from './libs/openai';
+---import { openWebView } from './libs/webview';
+---import { SidebarProvider } from './SidebarProvider';
+---import { get } from 'http';
+--+import { getAPIKey, promptForAPIKey, saveAPIKey } from './libs/helpers';
+-- 
+-- 
+---async function promptForAPIKey() {
+---  const apiKey = await vscode.window.showInputBox({
+---    prompt: 'Please enter your API key',
+---    placeHolder: 'API key',
+---  });
+---  return apiKey;
+---}
+---
+-- // This method is called when your extension is activated
+-- // Your extension is activated the very first time the command is executed
+-- export function activate(context: vscode.ExtensionContext) {
+--@@ -32,19 +22,9 @@ export function activate(context: vscode.ExtensionContext) {
+-- 	// check if api key is already saved
+-- 	let key = getAPIKey(context);
+-- 
+---	  if (!key) {
+--+	if (!key) {
+--     vscode.window.showInformationMessage('No API key found. Please enter your API key.');
+---
+---    promptForAPIKey().then((apiKey) => {
+---      if (apiKey) {
+---        // Save the API key.
+---        saveAPIKey(context, apiKey);
+---
+---        vscode.window.showInformationMessage('API key saved successfully.');
+---      } else {
+---        vscode.window.showWarningMessage('API key was not provided.');
+---      }
+---    });
+--+    promptForAPIKey(context);
+--   }
+-- 
+-- 	// init webview
+--@@ -53,17 +33,6 @@ export function activate(context: vscode.ExtensionContext) {
+-- 	// controller.registerCommands();
+-- 	let disposable = vscode.commands.registerCommand('automit.automit', async () => {
+-- 
+---
+---		// const sidebarProvider = new SidebarProvider(context.extensionUri);
+---		// context.subscriptions.push(
+---		// 	vscode.window.registerWebviewViewProvider(
+---		// 		"automit-sidebar",
+---		// 		sidebarProvider
+---		// 	)
+---		// );
+---		// The code you place here will be executed every time your command is executed
+---		// Display a message box to the user
+---
+-- 		const diff = await getDiff();
+-- 		if(diff !== undefined){
+-- 			// check if diff is empty
+--diff --git a/src/libs/sourceControl.ts b/src/libs/sourceControl.ts
+--index bd6bf1f..cee2d05 100644
+----- a/src/libs/sourceControl.ts
+--+++ b/src/libs/sourceControl.ts
+--@@ -5,16 +5,7 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+-- 
+-- 
+-- 
+---export function getAPIKey(context: vscode.ExtensionContext) {
+---  // Get the API key from the global state
+---  const apiKey = context.globalState.get('automit.apiKey') as string;
+---  return apiKey;
+---}
+-- 
+---export async function saveAPIKey(context: vscode.ExtensionContext,apiKey: string) {
+---  // Save the API key to the global state
+---  await context.globalState.update('automit.apiKey', apiKey);
+---}
+-- 
+-- 
+-- 
 -diff --git a/src/extension.ts b/src/extension.ts
--index 9bdeee3..dd14319 100644
+-index dd14319..f1bcddb 100644
 ---- a/src/extension.ts
 -+++ b/src/extension.ts
--@@ -1,21 +1,11 @@
-- // The module 'vscode' contains the VS Code extensibility API
-- // Import the module and reference it with the alias vscode in your code below
-- import * as vscode from 'vscode';
---import { SourceControlProvider, addAllFiles, autoCommit, getDiff, getAPIKey, saveAPIKey, autoPush } from './libs/sourceControl';
--+import {  addAllFiles, autoCommit, getDiff,  } from './libs/sourceControl';
-- import { openAITest } from './libs/openai';
---import { openWebView } from './libs/webview';
---import { SidebarProvider } from './SidebarProvider';
---import { get } from 'http';
--+import { getAPIKey, promptForAPIKey, saveAPIKey } from './libs/helpers';
+-@@ -40,6 +40,13 @@ export function activate(context: vscode.ExtensionContext) {
+- 				vscode.window.showInformationMessage('No changes to commit');
+- 				return;
+- 			}
+-+
+-+			const key = getAPIKey(context);
+-+			if(!key){
+-+				vscode.window.showInformationMessage('No API key found. Please enter your API key.');
+-+				promptForAPIKey(context);
+-+			}
+-+
+- 			let comp = await openAITest(context, diff);
 - 
-- 
---async function promptForAPIKey() {
---  const apiKey = await vscode.window.showInputBox({
---    prompt: 'Please enter your API key',
---    placeHolder: 'API key',
---  });
---  return apiKey;
---}
---
-- // This method is called when your extension is activated
-- // Your extension is activated the very first time the command is executed
-- export function activate(context: vscode.ExtensionContext) {
--@@ -32,19 +22,9 @@ export function activate(context: vscode.ExtensionContext) {
-- 	// check if api key is already saved
-- 	let key = getAPIKey(context);
-- 
---	  if (!key) {
--+	if (!key) {
--     vscode.window.showInformationMessage('No API key found. Please enter your API key.');
---
---    promptForAPIKey().then((apiKey) => {
---      if (apiKey) {
---        // Save the API key.
---        saveAPIKey(context, apiKey);
---
---        vscode.window.showInformationMessage('API key saved successfully.');
---      } else {
---        vscode.window.showWarningMessage('API key was not provided.');
---      }
---    });
--+    promptForAPIKey(context);
--   }
-- 
-- 	// init webview
--@@ -53,17 +33,6 @@ export function activate(context: vscode.ExtensionContext) {
-- 	// controller.registerCommands();
-- 	let disposable = vscode.commands.registerCommand('automit.automit', async () => {
-- 
---
---		// const sidebarProvider = new SidebarProvider(context.extensionUri);
---		// context.subscriptions.push(
---		// 	vscode.window.registerWebviewViewProvider(
---		// 		"automit-sidebar",
---		// 		sidebarProvider
---		// 	)
---		// );
---		// The code you place here will be executed every time your command is executed
---		// Display a message box to the user
---
-- 		const diff = await getDiff();
-- 		if(diff !== undefined){
-- 			// check if diff is empty
--diff --git a/src/libs/sourceControl.ts b/src/libs/sourceControl.ts
--index bd6bf1f..cee2d05 100644
----- a/src/libs/sourceControl.ts
--+++ b/src/libs/sourceControl.ts
--@@ -5,16 +5,7 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-- 
-- 
-- 
---export function getAPIKey(context: vscode.ExtensionContext) {
---  // Get the API key from the global state
---  const apiKey = context.globalState.get('automit.apiKey') as string;
---  return apiKey;
---}
-- 
---export async function saveAPIKey(context: vscode.ExtensionContext,apiKey: string) {
---  // Save the API key to the global state
---  await context.globalState.update('automit.apiKey', apiKey);
---}
-- 
-- 
-- 
+- 			// ask user if they want to commit with the given message
+diff --git a/package.json b/package.json
+index b471cb9..a97cc40 100644
+--- a/package.json
++++ b/package.json
+@@ -47,6 +47,10 @@
+       {
+         "command": "automit.SourceControlCommand",
+         "title": "Start Automit"
++      },
++      {
++        "command": "automit.newKey",
++        "title": "Enter New API Key"
+       }
+     ]
+   },
 diff --git a/src/extension.ts b/src/extension.ts
-index dd14319..f1bcddb 100644
+index f1bcddb..f802d03 100644
 --- a/src/extension.ts
 +++ b/src/extension.ts
-@@ -40,6 +40,13 @@ export function activate(context: vscode.ExtensionContext) {
- 				vscode.window.showInformationMessage('No changes to commit');
- 				return;
- 			}
-+
-+			const key = getAPIKey(context);
-+			if(!key){
-+				vscode.window.showInformationMessage('No API key found. Please enter your API key.');
-+				promptForAPIKey(context);
-+			}
-+
- 			let comp = await openAITest(context, diff);
+@@ -89,8 +89,11 @@ export function activate(context: vscode.ExtensionContext) {
  
- 			// ask user if they want to commit with the given message
+ 	});
+ 
++	let newKey = vscode.commands.registerCommand('automit.newKey', async () => {
++		promptForAPIKey(context);
++	});
+ 	context.subscriptions.push(disposable);
+-	// context.subscriptions.push(controller);
++	context.subscriptions.push(newKey);
+ }
+ 
+ // This method is called when your extension is deactivated

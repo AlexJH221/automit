@@ -47,6 +47,10 @@
       {
         "command": "automit.SourceControlCommand",
         "title": "Start Automit"
+      },
+      {
+        "command": "automit.newKey",
+        "title": "Enter New API Key"
       }
     ]
   },
