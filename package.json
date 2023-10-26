@@ -39,6 +39,15 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "type": "webview",
+          "id": "automit.commitView",
+          "name": "Automit"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "automit.automit",

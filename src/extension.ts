@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 import {  addAllFiles, autoCommit, getDiff,  } from './libs/sourceControl';
 import { openAITest } from './libs/openai';
 import { getAPIKey, promptForAPIKey, saveAPIKey } from './libs/helpers';
+import AutomitCommitView from './libs/webview';
 
 
 // This method is called when your extension is activated
@@ -92,6 +93,11 @@ export function activate(context: vscode.ExtensionContext) {
 	let newKey = vscode.commands.registerCommand('automit.newKey', async () => {
 		promptForAPIKey(context);
 	});
+	const provider = new AutomitCommitView(context.extensionUri, context);
+
+	context.subscriptions.push(
+		vscode.window.registerWebviewViewProvider(AutomitCommitView.viewType, provider));
+
 	context.subscriptions.push(disposable);
 	context.subscriptions.push(newKey);
 }
