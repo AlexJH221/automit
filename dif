@@ -1,429 +1,434 @@
 diff --git a/dif b/dif
-index cc8a6a5..e69de29 100644
+index a05ffde..e69de29 100644
 --- a/dif
 +++ b/dif
-@@ -1,411 +0,0 @@
+@@ -1,429 +0,0 @@
 -diff --git a/dif b/dif
--index 2de5e83..e69de29 100644
+-index cc8a6a5..e69de29 100644
 ---- a/dif
 -+++ b/dif
--@@ -1,194 +0,0 @@
+-@@ -1,411 +0,0 @@
 --diff --git a/dif b/dif
---index d62973a..e69de29 100644
+--index 2de5e83..e69de29 100644
 ----- a/dif
 --+++ b/dif
---@@ -1,149 +0,0 @@
+--@@ -1,194 +0,0 @@
 ---diff --git a/dif b/dif
----index 36c5f88..e69de29 100644
+---index d62973a..e69de29 100644
 ------ a/dif
 ---+++ b/dif
----@@ -1,112 +0,0 @@
+---@@ -1,149 +0,0 @@
 ----diff --git a/dif b/dif
-----index 37ed69b..e69de29 100644
+----index 36c5f88..e69de29 100644
 ------- a/dif
 ----+++ b/dif
-----@@ -1,89 +0,0 @@
+----@@ -1,112 +0,0 @@
+-----diff --git a/dif b/dif
+-----index 37ed69b..e69de29 100644
+-------- a/dif
+-----+++ b/dif
+-----@@ -1,89 +0,0 @@
+------diff --git a/src/extension.ts b/src/extension.ts
+------index 9bdeee3..dd14319 100644
+--------- a/src/extension.ts
+------+++ b/src/extension.ts
+------@@ -1,21 +1,11 @@
+------ // The module 'vscode' contains the VS Code extensibility API
+------ // Import the module and reference it with the alias vscode in your code below
+------ import * as vscode from 'vscode';
+-------import { SourceControlProvider, addAllFiles, autoCommit, getDiff, getAPIKey, saveAPIKey, autoPush } from './libs/sourceControl';
+------+import {  addAllFiles, autoCommit, getDiff,  } from './libs/sourceControl';
+------ import { openAITest } from './libs/openai';
+-------import { openWebView } from './libs/webview';
+-------import { SidebarProvider } from './SidebarProvider';
+-------import { get } from 'http';
+------+import { getAPIKey, promptForAPIKey, saveAPIKey } from './libs/helpers';
+------ 
+------ 
+-------async function promptForAPIKey() {
+-------  const apiKey = await vscode.window.showInputBox({
+-------    prompt: 'Please enter your API key',
+-------    placeHolder: 'API key',
+-------  });
+-------  return apiKey;
+-------}
+-------
+------ // This method is called when your extension is activated
+------ // Your extension is activated the very first time the command is executed
+------ export function activate(context: vscode.ExtensionContext) {
+------@@ -32,19 +22,9 @@ export function activate(context: vscode.ExtensionContext) {
+------ 	// check if api key is already saved
+------ 	let key = getAPIKey(context);
+------ 
+-------	  if (!key) {
+------+	if (!key) {
+------     vscode.window.showInformationMessage('No API key found. Please enter your API key.');
+-------
+-------    promptForAPIKey().then((apiKey) => {
+-------      if (apiKey) {
+-------        // Save the API key.
+-------        saveAPIKey(context, apiKey);
+-------
+-------        vscode.window.showInformationMessage('API key saved successfully.');
+-------      } else {
+-------        vscode.window.showWarningMessage('API key was not provided.');
+-------      }
+-------    });
+------+    promptForAPIKey(context);
+------   }
+------ 
+------ 	// init webview
+------@@ -53,17 +33,6 @@ export function activate(context: vscode.ExtensionContext) {
+------ 	// controller.registerCommands();
+------ 	let disposable = vscode.commands.registerCommand('automit.automit', async () => {
+------ 
+-------
+-------		// const sidebarProvider = new SidebarProvider(context.extensionUri);
+-------		// context.subscriptions.push(
+-------		// 	vscode.window.registerWebviewViewProvider(
+-------		// 		"automit-sidebar",
+-------		// 		sidebarProvider
+-------		// 	)
+-------		// );
+-------		// The code you place here will be executed every time your command is executed
+-------		// Display a message box to the user
+-------
+------ 		const diff = await getDiff();
+------ 		if(diff !== undefined){
+------ 			// check if diff is empty
+------diff --git a/src/libs/sourceControl.ts b/src/libs/sourceControl.ts
+------index bd6bf1f..cee2d05 100644
+--------- a/src/libs/sourceControl.ts
+------+++ b/src/libs/sourceControl.ts
+------@@ -5,16 +5,7 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+------ 
+------ 
+------ 
+-------export function getAPIKey(context: vscode.ExtensionContext) {
+-------  // Get the API key from the global state
+-------  const apiKey = context.globalState.get('automit.apiKey') as string;
+-------  return apiKey;
+-------}
+------ 
+-------export async function saveAPIKey(context: vscode.ExtensionContext,apiKey: string) {
+-------  // Save the API key to the global state
+-------  await context.globalState.update('automit.apiKey', apiKey);
+-------}
+------ 
+------ 
+------ 
 -----diff --git a/src/extension.ts b/src/extension.ts
------index 9bdeee3..dd14319 100644
+-----index dd14319..f1bcddb 100644
 -------- a/src/extension.ts
 -----+++ b/src/extension.ts
------@@ -1,21 +1,11 @@
------ // The module 'vscode' contains the VS Code extensibility API
------ // Import the module and reference it with the alias vscode in your code below
------ import * as vscode from 'vscode';
-------import { SourceControlProvider, addAllFiles, autoCommit, getDiff, getAPIKey, saveAPIKey, autoPush } from './libs/sourceControl';
------+import {  addAllFiles, autoCommit, getDiff,  } from './libs/sourceControl';
------ import { openAITest } from './libs/openai';
-------import { openWebView } from './libs/webview';
-------import { SidebarProvider } from './SidebarProvider';
-------import { get } from 'http';
------+import { getAPIKey, promptForAPIKey, saveAPIKey } from './libs/helpers';
+-----@@ -40,6 +40,13 @@ export function activate(context: vscode.ExtensionContext) {
+----- 				vscode.window.showInformationMessage('No changes to commit');
+----- 				return;
+----- 			}
+-----+
+-----+			const key = getAPIKey(context);
+-----+			if(!key){
+-----+				vscode.window.showInformationMessage('No API key found. Please enter your API key.');
+-----+				promptForAPIKey(context);
+-----+			}
+-----+
+----- 			let comp = await openAITest(context, diff);
 ----- 
------ 
-------async function promptForAPIKey() {
-------  const apiKey = await vscode.window.showInputBox({
-------    prompt: 'Please enter your API key',
-------    placeHolder: 'API key',
-------  });
-------  return apiKey;
-------}
-------
------ // This method is called when your extension is activated
------ // Your extension is activated the very first time the command is executed
------ export function activate(context: vscode.ExtensionContext) {
------@@ -32,19 +22,9 @@ export function activate(context: vscode.ExtensionContext) {
------ 	// check if api key is already saved
------ 	let key = getAPIKey(context);
------ 
-------	  if (!key) {
------+	if (!key) {
------     vscode.window.showInformationMessage('No API key found. Please enter your API key.');
-------
-------    promptForAPIKey().then((apiKey) => {
-------      if (apiKey) {
-------        // Save the API key.
-------        saveAPIKey(context, apiKey);
-------
-------        vscode.window.showInformationMessage('API key saved successfully.');
-------      } else {
-------        vscode.window.showWarningMessage('API key was not provided.');
-------      }
-------    });
------+    promptForAPIKey(context);
------   }
------ 
------ 	// init webview
------@@ -53,17 +33,6 @@ export function activate(context: vscode.ExtensionContext) {
------ 	// controller.registerCommands();
------ 	let disposable = vscode.commands.registerCommand('automit.automit', async () => {
------ 
-------
-------		// const sidebarProvider = new SidebarProvider(context.extensionUri);
-------		// context.subscriptions.push(
-------		// 	vscode.window.registerWebviewViewProvider(
-------		// 		"automit-sidebar",
-------		// 		sidebarProvider
-------		// 	)
-------		// );
-------		// The code you place here will be executed every time your command is executed
-------		// Display a message box to the user
-------
------ 		const diff = await getDiff();
------ 		if(diff !== undefined){
------ 			// check if diff is empty
------diff --git a/src/libs/sourceControl.ts b/src/libs/sourceControl.ts
------index bd6bf1f..cee2d05 100644
--------- a/src/libs/sourceControl.ts
------+++ b/src/libs/sourceControl.ts
------@@ -5,16 +5,7 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
------ 
------ 
------ 
-------export function getAPIKey(context: vscode.ExtensionContext) {
-------  // Get the API key from the global state
-------  const apiKey = context.globalState.get('automit.apiKey') as string;
-------  return apiKey;
-------}
------ 
-------export async function saveAPIKey(context: vscode.ExtensionContext,apiKey: string) {
-------  // Save the API key to the global state
-------  await context.globalState.update('automit.apiKey', apiKey);
-------}
------ 
------ 
------ 
+----- 			// ask user if they want to commit with the given message
+----diff --git a/package.json b/package.json
+----index b471cb9..a97cc40 100644
+------- a/package.json
+----+++ b/package.json
+----@@ -47,6 +47,10 @@
+----       {
+----         "command": "automit.SourceControlCommand",
+----         "title": "Start Automit"
+----+      },
+----+      {
+----+        "command": "automit.newKey",
+----+        "title": "Enter New API Key"
+----       }
+----     ]
+----   },
 ----diff --git a/src/extension.ts b/src/extension.ts
-----index dd14319..f1bcddb 100644
+----index f1bcddb..f802d03 100644
 ------- a/src/extension.ts
 ----+++ b/src/extension.ts
-----@@ -40,6 +40,13 @@ export function activate(context: vscode.ExtensionContext) {
----- 				vscode.window.showInformationMessage('No changes to commit');
----- 				return;
----- 			}
-----+
-----+			const key = getAPIKey(context);
-----+			if(!key){
-----+				vscode.window.showInformationMessage('No API key found. Please enter your API key.');
-----+				promptForAPIKey(context);
-----+			}
-----+
----- 			let comp = await openAITest(context, diff);
+----@@ -89,8 +89,11 @@ export function activate(context: vscode.ExtensionContext) {
 ---- 
----- 			// ask user if they want to commit with the given message
----diff --git a/package.json b/package.json
----index b471cb9..a97cc40 100644
------- a/package.json
----+++ b/package.json
----@@ -47,6 +47,10 @@
----       {
----         "command": "automit.SourceControlCommand",
----         "title": "Start Automit"
----+      },
----+      {
----+        "command": "automit.newKey",
----+        "title": "Enter New API Key"
----       }
----     ]
----   },
----diff --git a/src/extension.ts b/src/extension.ts
----index f1bcddb..f802d03 100644
------- a/src/extension.ts
----+++ b/src/extension.ts
----@@ -89,8 +89,11 @@ export function activate(context: vscode.ExtensionContext) {
+---- 	});
+---- 
+----+	let newKey = vscode.commands.registerCommand('automit.newKey', async () => {
+----+		promptForAPIKey(context);
+----+	});
+---- 	context.subscriptions.push(disposable);
+-----	// context.subscriptions.push(controller);
+----+	context.subscriptions.push(newKey);
+---- }
+---- 
+---- // This method is called when your extension is deactivated
+---diff --git a/src/libs/openai.ts b/src/libs/openai.ts
+---index 29c4a91..c5d8b8e 100644
+------ a/src/libs/openai.ts
+---+++ b/src/libs/openai.ts
+---@@ -1,7 +1,7 @@
+--- import * as vscode from 'vscode';
+--- import OpenAI from "openai";
+--- import { ChatCompletion } from 'openai/resources';
+----import { getAPIKey } from './sourceControl';
+---+import { getAPIKey } from './helpers';
 --- 
---- 	});
 --- 
----+	let newKey = vscode.commands.registerCommand('automit.newKey', async () => {
----+		promptForAPIKey(context);
----+	});
---- 	context.subscriptions.push(disposable);
-----	// context.subscriptions.push(controller);
----+	context.subscriptions.push(newKey);
+--- // do not hardcode api key
+---@@ -12,25 +12,11 @@ export async function openAITest(context: vscode.ExtensionContext, diff: String)
+---   const apiKey = await getAPIKey(context);
+---   const openai = new OpenAI({ apiKey: apiKey });
+--- 
+----  
+----  const outputChannel = vscode.window.createOutputChannel('OpenAI Output Channel');
+----  let terminal;
+----  if (vscode.window.activeTerminal) {
+----    terminal = vscode.window.activeTerminal;
+----  }
+----  else {
+----    terminal = vscode.window.createTerminal('OpenAI');
+----  }
+----
+---   const completion = await openai.chat.completions.create({
+----    messages: [{ role: "system", content: `write a git commit message for this diff thats between 50-75 charecters long with the format "<category>: <message>" where categor can be either "feat" for a new feature, "ref" for refactoring, "fix" for fixing a bug : ${diff}` }],
+---+    messages: [{ role: "assistant", content: `write a git commit message for this diff thats between 50-100 charecters long with the format "<category>: <message>" where categor can be either "feat" for a new feature, "ref" for refactoring, "fix" for fixing a bug : ${diff}` }],
+---     model: "gpt-3.5-turbo",
+---   });
+--- 
+---   
+----  // terminal.sendText(`${JSON.stringify(completion.choices[0])}`, false);
+----  // outputChannel.appendLine(`${JSON.stringify(completion.choices[0])}`);
+----  // outputChannel.show();
+----
+---   return completion;
 --- }
---- 
---- // This method is called when your extension is deactivated
+--diff --git a/package.json b/package.json
+--index f91857a..5dfbef7 100644
+----- a/package.json
+--+++ b/package.json
+--@@ -39,6 +39,15 @@
+--   ],
+--   "main": "./out/extension.js",
+--   "contributes": {
+--+    "views": {
+--+      "explorer": [
+--+        {
+--+          "type": "webview",
+--+          "id": "automit.commitView",
+--+          "name": "Automit"
+--+        }
+--+      ]
+--+    },
+--     "commands": [
+--       {
+--         "command": "automit.automit",
+--diff --git a/src/extension.ts b/src/extension.ts
+--index f802d03..45c64e2 100644
+----- a/src/extension.ts
+--+++ b/src/extension.ts
+--@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
+-- import {  addAllFiles, autoCommit, getDiff,  } from './libs/sourceControl';
+-- import { openAITest } from './libs/openai';
+-- import { getAPIKey, promptForAPIKey, saveAPIKey } from './libs/helpers';
+--+import AutomitCommitView from './libs/webview';
+-- 
+-- 
+-- // This method is called when your extension is activated
+--@@ -92,6 +93,11 @@ export function activate(context: vscode.ExtensionContext) {
+-- 	let newKey = vscode.commands.registerCommand('automit.newKey', async () => {
+-- 		promptForAPIKey(context);
+-- 	});
+--+	const provider = new AutomitCommitView(context.extensionUri, context);
+--+
+--+	context.subscriptions.push(
+--+		vscode.window.registerWebviewViewProvider(AutomitCommitView.viewType, provider));
+--+
+-- 	context.subscriptions.push(disposable);
+-- 	context.subscriptions.push(newKey);
+-- }
 --diff --git a/src/libs/openai.ts b/src/libs/openai.ts
---index 29c4a91..c5d8b8e 100644
+--index c5d8b8e..de18e3e 100644
 ----- a/src/libs/openai.ts
 --+++ b/src/libs/openai.ts
---@@ -1,7 +1,7 @@
--- import * as vscode from 'vscode';
+--@@ -2,13 +2,24 @@ import * as vscode from 'vscode';
 -- import OpenAI from "openai";
 -- import { ChatCompletion } from 'openai/resources';
----import { getAPIKey } from './sourceControl';
---+import { getAPIKey } from './helpers';
+-- import { getAPIKey } from './helpers';
+--+import { getDiff } from './sourceControl';
 -- 
 -- 
--- // do not hardcode api key
---@@ -12,25 +12,11 @@ export async function openAITest(context: vscode.ExtensionContext, diff: String)
+---// do not hardcode api key
+---// prompt user for api key and store it in the global state
+--+export async function openAITest(context: vscode.ExtensionContext, diff: String): Promise<ChatCompletion> {
+--+  const apiKey = await getAPIKey(context);
+--+  const openai = new OpenAI({ apiKey: apiKey });
+--+
+--+  const completion = await openai.chat.completions.create({
+--+    messages: [{ role: "assistant", content: `write a git commit message for this diff thats between 50-100 charecters long with the format "<category>: <message>" where categor can be either "feat" for a new feature, "ref" for refactoring, "fix" for fixing a bug : ${diff}` }],
+--+    model: "gpt-3.5-turbo",
+--+  });
+-- 
+--+  
+--+  return completion;
+--+}
+-- 
+---export async function openAITest(context: vscode.ExtensionContext, diff: String): Promise<ChatCompletion> {
+--+export async function generateMessage(context: vscode.ExtensionContext): Promise<ChatCompletion> {
+--+  const diff = await getDiff();
 --   const apiKey = await getAPIKey(context);
 --   const openai = new OpenAI({ apiKey: apiKey });
 -- 
----  
----  const outputChannel = vscode.window.createOutputChannel('OpenAI Output Channel');
----  let terminal;
----  if (vscode.window.activeTerminal) {
----    terminal = vscode.window.activeTerminal;
----  }
----  else {
----    terminal = vscode.window.createTerminal('OpenAI');
----  }
----
---   const completion = await openai.chat.completions.create({
----    messages: [{ role: "system", content: `write a git commit message for this diff thats between 50-75 charecters long with the format "<category>: <message>" where categor can be either "feat" for a new feature, "ref" for refactoring, "fix" for fixing a bug : ${diff}` }],
---+    messages: [{ role: "assistant", content: `write a git commit message for this diff thats between 50-100 charecters long with the format "<category>: <message>" where categor can be either "feat" for a new feature, "ref" for refactoring, "fix" for fixing a bug : ${diff}` }],
---     model: "gpt-3.5-turbo",
---   });
+--diff --git a/src/libs/webview.ts b/src/libs/webview.ts
+--index 3512fbd..e390ac8 100644
+----- a/src/libs/webview.ts
+--+++ b/src/libs/webview.ts
+--@@ -1,27 +1,108 @@
+-- import * as vscode from 'vscode';
+--+import { generateMessage, openAITest } from './openai';
 -- 
---   
----  // terminal.sendText(`${JSON.stringify(completion.choices[0])}`, false);
----  // outputChannel.appendLine(`${JSON.stringify(completion.choices[0])}`);
----  // outputChannel.show();
+---export function openWebView() {
+---    const panel = vscode.window.createWebviewPanel(
+---        'myWebView', // Unique ID
+---        'My WebView', // Title
+---        vscode.ViewColumn.One, // Column to show the panel in
+---        {
+---            enableScripts: true, // Enable JavaScript
+---        }
+---    );
 ---
---   return completion;
+---    // Read the HTML content from your file and set it as WebView content
+---    const webViewContent = 
+---        `<!Doctype html> \
+---        <html lang="en"> \
+---        <head>\
+---            <meta charset="UTF-8">\
+---            <title>My First WebView</title>\
+---        </head>\
+---        <body>\
+---            <h1>Hello World!</h1>\
+---        </body>\
+---        </html>`
+---        panel.webview.html = webViewContent;
+--+export default class AutomitCommitView implements vscode.WebviewViewProvider {
+--+
+--+	public static readonly viewType = 'automit.commitView';
+--+
+--+	private _view?: vscode.WebviewView;
+--+    private context: vscode.ExtensionContext;
+--+
+--+	constructor(
+--+		private readonly _extensionUri: vscode.Uri, context: vscode.ExtensionContext
+--+	) { 
+--+        this.context = context;
+--+    }
+--+
+--+	public resolveWebviewView(
+--+		webviewView: vscode.WebviewView,
+--+		context: vscode.WebviewViewResolveContext,
+--+		_token: vscode.CancellationToken,
+--+	) {
+--+		this._view = webviewView;
+--+
+--+		webviewView.webview.options = {
+--+			// Allow scripts in the webview
+--+			enableScripts: true,
+--+
+--+			localResourceRoots: [
+--+				this._extensionUri
+--+			]
+--+		};
+--+
+--+		webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+--+
+--+		webviewView.webview.onDidReceiveMessage(data => {
+--+			switch (data.type) {
+--+				case 'generateCommitMessage':
+--+					{
+--+						// vscode.window.activeTextEditor?.insertSnippet(new vscode.SnippetString(`#${data.value}`));
+--+                        generateMessage(this.context).then((completion) => {
+--+                            vscode.window.activeTextEditor?.insertSnippet(new vscode.SnippetString(`${completion.choices[0].message.content}`));
+--+                        });
+--+						break;
+--+					}
+--+			}
+--+		});
+--+	}
+--+
+--+	public commitMessage() {
+--+		if (this._view) {
+--+			this._view.show?.(true); // `show` is not implemented in 1.49 but is for 1.50 insiders
+--+			this._view.webview.postMessage({ type: 'generateCommitMessage' });
+--+		}
+--+	}
+--+
+--+
+--+	private _getHtmlForWebview(webview: vscode.Webview) {
+--+		// Get the local path to main script run in the webview, then convert it to a uri we can use in the webview.
+--+		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js'));
+--+
+--+		// Do the same for the stylesheet.
+--+		const styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'reset.css'));
+--+		const styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'vscode.css'));
+--+		const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.css'));
+--+
+--+		// Use a nonce to only allow a specific script to be run.
+--+		const nonce = getNonce();
+--+
+--+		return `<!DOCTYPE html>
+--+			<html lang="en">
+--+			<head>
+--+				<meta charset="UTF-8">
+--+
+--+				<!--
+--+					Use a content security policy to only allow loading styles from our extension directory,
+--+					and only allow scripts that have a specific nonce.
+--+					(See the 'webview-sample' extension sample for img-src content security policy examples)
+--+				-->
+--+				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
+--+
+--+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+--+
+--+				<link href="${styleResetUri}" rel="stylesheet">
+--+				<link href="${styleVSCodeUri}" rel="stylesheet">
+--+				<link href="${styleMainUri}" rel="stylesheet">
+--+
+--+				<title>Cat Colors</title>
+--+			</head>
+--+			<body>
+--+				<ul class="color-list">
+--+				</ul>
+--+
+--+				<button class="add-color-button">Commit Message</button>
+--+
+--+				<script nonce="${nonce}" src="${scriptUri}"></script>
+--+			</body>
+--+			</html>`;
+--+	}
 -- }
--diff --git a/package.json b/package.json
--index f91857a..5dfbef7 100644
----- a/package.json
--+++ b/package.json
--@@ -39,6 +39,15 @@
--   ],
--   "main": "./out/extension.js",
--   "contributes": {
--+    "views": {
--+      "explorer": [
--+        {
--+          "type": "webview",
--+          "id": "automit.commitView",
--+          "name": "Automit"
--+        }
--+      ]
--+    },
--     "commands": [
--       {
--         "command": "automit.automit",
--diff --git a/src/extension.ts b/src/extension.ts
--index f802d03..45c64e2 100644
----- a/src/extension.ts
--+++ b/src/extension.ts
--@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
-- import {  addAllFiles, autoCommit, getDiff,  } from './libs/sourceControl';
-- import { openAITest } from './libs/openai';
-- import { getAPIKey, promptForAPIKey, saveAPIKey } from './libs/helpers';
--+import AutomitCommitView from './libs/webview';
-- 
-- 
-- // This method is called when your extension is activated
--@@ -92,6 +93,11 @@ export function activate(context: vscode.ExtensionContext) {
-- 	let newKey = vscode.commands.registerCommand('automit.newKey', async () => {
-- 		promptForAPIKey(context);
-- 	});
--+	const provider = new AutomitCommitView(context.extensionUri, context);
--+
--+	context.subscriptions.push(
--+		vscode.window.registerWebviewViewProvider(AutomitCommitView.viewType, provider));
--+
-- 	context.subscriptions.push(disposable);
-- 	context.subscriptions.push(newKey);
-- }
--diff --git a/src/libs/openai.ts b/src/libs/openai.ts
--index c5d8b8e..de18e3e 100644
----- a/src/libs/openai.ts
--+++ b/src/libs/openai.ts
--@@ -2,13 +2,24 @@ import * as vscode from 'vscode';
-- import OpenAI from "openai";
-- import { ChatCompletion } from 'openai/resources';
-- import { getAPIKey } from './helpers';
--+import { getDiff } from './sourceControl';
-- 
-- 
---// do not hardcode api key
---// prompt user for api key and store it in the global state
--+export async function openAITest(context: vscode.ExtensionContext, diff: String): Promise<ChatCompletion> {
--+  const apiKey = await getAPIKey(context);
--+  const openai = new OpenAI({ apiKey: apiKey });
--+
--+  const completion = await openai.chat.completions.create({
--+    messages: [{ role: "assistant", content: `write a git commit message for this diff thats between 50-100 charecters long with the format "<category>: <message>" where categor can be either "feat" for a new feature, "ref" for refactoring, "fix" for fixing a bug : ${diff}` }],
--+    model: "gpt-3.5-turbo",
--+  });
-- 
--+  
--+  return completion;
--+}
-- 
---export async function openAITest(context: vscode.ExtensionContext, diff: String): Promise<ChatCompletion> {
--+export async function generateMessage(context: vscode.ExtensionContext): Promise<ChatCompletion> {
--+  const diff = await getDiff();
--   const apiKey = await getAPIKey(context);
--   const openai = new OpenAI({ apiKey: apiKey });
-- 
+-- 
+--+function getNonce() {
+--+	let text = '';
+--+	const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+--+	for (let i = 0; i < 32; i++) {
+--+		text += possible.charAt(Math.floor(Math.random() * possible.length));
+--+	}
+--+	return text;
+--+}
 -diff --git a/src/libs/webview.ts b/src/libs/webview.ts
--index 3512fbd..e390ac8 100644
+-index e390ac8..5fcd58d 100644
 ---- a/src/libs/webview.ts
 -+++ b/src/libs/webview.ts
--@@ -1,27 +1,108 @@
-- import * as vscode from 'vscode';
--+import { generateMessage, openAITest } from './openai';
+-@@ -84,7 +84,7 @@ export default class AutomitCommitView implements vscode.WebviewViewProvider {
+- 				<link href="${styleVSCodeUri}" rel="stylesheet">
+- 				<link href="${styleMainUri}" rel="stylesheet">
 - 
---export function openWebView() {
---    const panel = vscode.window.createWebviewPanel(
---        'myWebView', // Unique ID
---        'My WebView', // Title
---        vscode.ViewColumn.One, // Column to show the panel in
---        {
---            enableScripts: true, // Enable JavaScript
---        }
---    );
---
---    // Read the HTML content from your file and set it as WebView content
---    const webViewContent = 
---        `<!Doctype html> \
---        <html lang="en"> \
---        <head>\
---            <meta charset="UTF-8">\
---            <title>My First WebView</title>\
---        </head>\
---        <body>\
---            <h1>Hello World!</h1>\
---        </body>\
---        </html>`
---        panel.webview.html = webViewContent;
--+export default class AutomitCommitView implements vscode.WebviewViewProvider {
--+
--+	public static readonly viewType = 'automit.commitView';
--+
--+	private _view?: vscode.WebviewView;
--+    private context: vscode.ExtensionContext;
--+
--+	constructor(
--+		private readonly _extensionUri: vscode.Uri, context: vscode.ExtensionContext
--+	) { 
--+        this.context = context;
--+    }
--+
--+	public resolveWebviewView(
--+		webviewView: vscode.WebviewView,
--+		context: vscode.WebviewViewResolveContext,
--+		_token: vscode.CancellationToken,
--+	) {
--+		this._view = webviewView;
--+
--+		webviewView.webview.options = {
--+			// Allow scripts in the webview
--+			enableScripts: true,
--+
--+			localResourceRoots: [
--+				this._extensionUri
--+			]
--+		};
--+
--+		webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
--+
--+		webviewView.webview.onDidReceiveMessage(data => {
--+			switch (data.type) {
--+				case 'generateCommitMessage':
--+					{
--+						// vscode.window.activeTextEditor?.insertSnippet(new vscode.SnippetString(`#${data.value}`));
--+                        generateMessage(this.context).then((completion) => {
--+                            vscode.window.activeTextEditor?.insertSnippet(new vscode.SnippetString(`${completion.choices[0].message.content}`));
--+                        });
--+						break;
--+					}
--+			}
--+		});
--+	}
--+
--+	public commitMessage() {
--+		if (this._view) {
--+			this._view.show?.(true); // `show` is not implemented in 1.49 but is for 1.50 insiders
--+			this._view.webview.postMessage({ type: 'generateCommitMessage' });
--+		}
--+	}
--+
--+
--+	private _getHtmlForWebview(webview: vscode.Webview) {
--+		// Get the local path to main script run in the webview, then convert it to a uri we can use in the webview.
--+		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.js'));
--+
--+		// Do the same for the stylesheet.
--+		const styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'reset.css'));
--+		const styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'vscode.css'));
--+		const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'media', 'main.css'));
--+
--+		// Use a nonce to only allow a specific script to be run.
--+		const nonce = getNonce();
--+
--+		return `<!DOCTYPE html>
--+			<html lang="en">
--+			<head>
--+				<meta charset="UTF-8">
--+
--+				<!--
--+					Use a content security policy to only allow loading styles from our extension directory,
--+					and only allow scripts that have a specific nonce.
--+					(See the 'webview-sample' extension sample for img-src content security policy examples)
--+				-->
--+				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
--+
--+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
--+
--+				<link href="${styleResetUri}" rel="stylesheet">
--+				<link href="${styleVSCodeUri}" rel="stylesheet">
--+				<link href="${styleMainUri}" rel="stylesheet">
--+
--+				<title>Cat Colors</title>
--+			</head>
--+			<body>
--+				<ul class="color-list">
--+				</ul>
--+
--+				<button class="add-color-button">Commit Message</button>
--+
--+				<script nonce="${nonce}" src="${scriptUri}"></script>
--+			</body>
--+			</html>`;
--+	}
-- }
-- 
--+function getNonce() {
--+	let text = '';
--+	const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
--+	for (let i = 0; i < 32; i++) {
--+		text += possible.charAt(Math.floor(Math.random() * possible.length));
--+	}
--+	return text;
--+}
-diff --git a/src/libs/webview.ts b/src/libs/webview.ts
-index e390ac8..5fcd58d 100644
---- a/src/libs/webview.ts
-+++ b/src/libs/webview.ts
-@@ -84,7 +84,7 @@ export default class AutomitCommitView implements vscode.WebviewViewProvider {
- 				<link href="${styleVSCodeUri}" rel="stylesheet">
- 				<link href="${styleMainUri}" rel="stylesheet">
- 
--				<title>Cat Colors</title>
-+				<title>Messages</title>
- 			</head>
- 			<body>
- 				<ul class="color-list">
+--				<title>Cat Colors</title>
+-+				<title>Messages</title>
+- 			</head>
+- 			<body>
+- 				<ul class="color-list">

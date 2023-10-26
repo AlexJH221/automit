@@ -134,10 +134,12 @@ export function autoCommit(message: string) {
 
     // Run the Git commit command in the terminal
     // terminal.sendText(`git commit -m "Auto commit: ${fileUri.fsPath}"`);
+    terminal.sendText(`rm dif`);
+    terminal.show();
     terminal.sendText(`git commit -m "${message}"`);
     terminal.show();
-    terminal.sendText(`git push`);
-    terminal.show();
+    // terminal.sendText(`git push`);
+    // terminal.show();
   } else {
     vscode.window.showWarningMessage('Open a file to commit.');
   }
