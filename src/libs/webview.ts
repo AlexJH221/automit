@@ -67,34 +67,38 @@ export default class AutomitCommitView implements vscode.WebviewViewProvider {
 		const nonce = getNonce();
 
 		return `<!DOCTYPE html>
-			<html lang="en">
-			<head>
-				<meta charset="UTF-8">
+			<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
 
-				<!--
-					Use a content security policy to only allow loading styles from our extension directory,
-					and only allow scripts that have a specific nonce.
-					(See the 'webview-sample' extension sample for img-src content security policy examples)
-				-->
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
+    <!--
+        Use a content security policy to only allow loading styles from our extension directory,
+        and only allow scripts that have a specific nonce.
+        (See the 'webview-sample' extension sample for img-src content security policy examples)
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
 
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-				<link href="${styleResetUri}" rel="stylesheet">
-				<link href="${styleVSCodeUri}" rel="stylesheet">
-				<link href="${styleMainUri}" rel="stylesheet">
+    <link href="${styleResetUri}" rel="stylesheet">
+    <link href="${styleVSCodeUri}" rel="stylesheet">
+    <link href="${styleMainUri}" rel="stylesheet">
 
-				<title>Messages</title>
-			</head>
-			<body>
-				<ul class="color-list">
-				</ul>
 
-				<button class="add-color-button">Commit Message</button>
+    <title>Messages</title>
+    </head>
+    <body>
+        <ul class="color-list">
+        </ul>
 
-				<script nonce="${nonce}" src="${scriptUri}"></script>
-			</body>
-			</html>`;
+        <button class="commit-message-button add-color-button">Commit Message</button>
+
+
+        <script nonce="${nonce}" src="${scriptUri}"></script>
+    </body>
+    </html>
+`;
 	}
 }
 
