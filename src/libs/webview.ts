@@ -84,7 +84,7 @@ export default class AutomitCommitView implements vscode.WebviewViewProvider {
 				<link href="${styleVSCodeUri}" rel="stylesheet">
 				<link href="${styleMainUri}" rel="stylesheet">
 
-				<title>Cat Colors</title>
+				<title>Messages</title>
 			</head>
 			<body>
 				<ul class="color-list">
