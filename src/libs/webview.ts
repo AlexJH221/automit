@@ -32,7 +32,7 @@ export default class AutomitCommitView implements vscode.WebviewViewProvider {
 
 		webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
-		webviewView.webview.onDidReceiveMessage(data => {
+		webviewView.webview.onDidReceiveMessage(async data => {
 			switch (data.type) {
 				case 'generateCommitMessage':
 					{
@@ -42,16 +42,27 @@ export default class AutomitCommitView implements vscode.WebviewViewProvider {
                         });
 						break;
 					}
+				case 'newMessageRequest':
+					{
+						// notification that a new message was added
+						let message = (await generateMessage(this.context)).choices[0].message.content;
+						// vscode.window.showInformationMessage(`New message requested: ${message}`);
+						this._view?.webview.postMessage({ type: 'newMessage', value: message });
+					}
+				case 'messageSelected':
+					{
+						// notification that a message was selected
+						vscode.window.showInformationMessage(`Message selected: ${data.value}`);
+						break;
+					}
+					break;
+				default:
+					break;
 			}
 		});
 	}
 
-	public commitMessage() {
-		if (this._view) {
-			this._view.show?.(true); // `show` is not implemented in 1.49 but is for 1.50 insiders
-			this._view.webview.postMessage({ type: 'generateCommitMessage' });
-		}
-	}
+	
 
 
 	private _getHtmlForWebview(webview: vscode.Webview) {
@@ -89,10 +100,11 @@ export default class AutomitCommitView implements vscode.WebviewViewProvider {
     <title>Messages</title>
     </head>
     <body>
-        <ul class="color-list">
+        <ul class="message-list">
         </ul>
 
-        <button class="commit-message-button add-color-button">Commit Message</button>
+        <button class="commit-message-button">Commit Message</button>
+        <button class="clear-messages-button_">Clear Messages</button>
 
 
         <script nonce="${nonce}" src="${scriptUri}"></script>

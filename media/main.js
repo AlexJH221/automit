@@ -3,6 +3,7 @@
 // This script will be run within the webview itself
 // It cannot access the main VS Code APIs directly.
 (function () {
+  // @ts-ignore
   const vscode = acquireVsCodeApi();
 
   const oldState = vscode.getState() || { colors: [] };
@@ -12,20 +13,27 @@
 
   updateColorList(colors);
 
+  // @ts-ignore
   document.querySelector('.add-color-button').addEventListener('click', () => {
-    addColor();
+    requestNewMessage();
+  });
+
+  // @ts-ignore
+  document.querySelector('.clear-colors-button').addEventListener('click', () => {
+    colors = [];
+    updateColorList(colors);
   });
 
   // Handle messages sent from the extension to the webview
   window.addEventListener('message', event => {
     const message = event.data; // The json data that the extension sent
     switch (message.type) {
-      case 'addColor':
+      case 'newMessage':
         {
-          addColor();
+          addColor(message.value);
           break;
         }
-      case 'clearColors':
+      case 'clearMessages':
         {
           colors = [];
           updateColorList(colors);
@@ -36,39 +44,37 @@
   });
 
   /**
-   * @param {Array<{ value: string }>} colors
+   * @param {Array<{ value: string }>} messages
    */
-  function updateColorList(colors) {
-    const ul = document.querySelector('.color-list');
+  function updateColorList(messages) {
+    const ul = document.querySelector('.message-list');
+    // @ts-ignore
     ul.textContent = '';
-    for (const color of colors) {
+    for (const message of messages) {
       const li = document.createElement('li');
-      li.className = 'color-entry';
-
-      const colorPreview = document.createElement('div');
-      colorPreview.className = 'color-preview';
-      colorPreview.style.backgroundColor = `#${color.value}`;
-      colorPreview.addEventListener('click', () => {
-        onColorClicked(color.value);
+      li.className = 'message-entry';
+      li.addEventListener('click', () => {
+        onMessageClicked(message.value);
       });
-      li.appendChild(colorPreview);
 
       const input = document.createElement('input');
-      input.className = 'color-input';
+      input.className = 'message-input';
       input.type = 'text';
-      input.value = color.value;
+      input.value = message.value;
       input.addEventListener('change', (e) => {
+        // @ts-ignore
         const value = e.target.value;
         if (!value) {
           // Treat empty value as delete
-          colors.splice(colors.indexOf(color), 1);
+          messages.splice(messages.indexOf(message), 1);
         } else {
-          color.value = value;
+          message.value = value;
         }
-        updateColorList(colors);
+        updateColorList(messages);
       });
       li.appendChild(input);
 
+      // @ts-ignore
       ul.appendChild(li);
     }
 
@@ -77,23 +83,31 @@
   }
 
   /** 
-   * @param {string} color 
+   * @param {string} m
    */
-  function onColorClicked(color) {
-    vscode.postMessage({ type: 'colorSelected', value: color });
+  // @ts-ignore
+  function onMessageClicked(m) {
+    vscode.postMessage({ type: 'messageSelected', value: m});
   }
 
   /**
    * @returns string
    */
+  // @ts-ignore
   function getNewCalicoColor() {
     const colors = ['020202', 'f1eeee', 'a85b20', 'daab70', 'efcb99'];
     return colors[Math.floor(Math.random() * colors.length)];
   }
 
-  function addColor() {
-    colors.push({ value: getNewCalicoColor() });
+  function addColor(m = 'test') {
+    // request new message to vscode etension
+    colors.push({ value: m });
     updateColorList(colors);
+  }
+
+  function requestNewMessage() {
+    // request new message to vscode etension
+    vscode.postMessage({ type: 'newMessageRequest' });
   }
 }());
 
