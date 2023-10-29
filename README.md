@@ -2,33 +2,30 @@
 
 Automit is a Visual Studio Code (VSCode) extension that streamlines the process of creating meaningful and consistent Git commit messages. Say goodbye to the struggle of crafting commit messages manually. With Automit, we've automated the process, offering you smart, context-aware message suggestions.
 
+. Search for "Automit" to find the extension settings.
+
 ## Features
 
-- Auto-generates Git commit messages based on code changes.
-- Encourages best practices for version control.
-- Improves developer productivity.
-- Customizable templates for various code modifications.
-- Integrates seamlessly with your development workflow.
+- **Auto-generate Commit Messages**: Automit automatically generates a list of commit messages for you to choose from, saving you time and effort.
 
-## Installation
+- **Interactive Message Selection**: Scroll through the list of generated messages and select the one that perfectly describes your changes.
 
-1. Open Visual Studio Code.
-2. Go to the Extensions view by clicking on the square icon in the sidebar or using `Ctrl+Shift+X`.
-3. Search for "Automit" and click the "Install" button.
+- **Commit with Confidence**: After selecting your commit message, you can proceed with the commit, knowing that your commit message accurately reflects your changes.
 
-## Usage
+## Getting Started
 
-1. Once installed, Automit will automatically analyze your code changes as you work.
-2. When you're ready to make a Git commit, you'll see commit message suggestions in the source control panel.
-3. Choose a suggestion or customize the commit message to your liking.
-4. Automit helps you maintain clean and informative commit histories effortlessly.
+To get started with Automit, follow these steps:
 
-## Configuration
+1. **Install the Extension**: Search for "Automit" in the VS Code Extensions Marketplace and install it.
 
-Automit is highly customizable. You can configure message templates and settings according to your preferences. To configure Automit, go to the extension's settings:
+2. **Open Your Project**: Navigate to your project or repository in VS Code.
 
-1. Click on the gear icon in the lower left corner of VSCode to open the Settings.
-2. Search for "Automit" to find the extension settings.
+3. **Generate Commit Message**: When you're ready to commit your changes, open the source code file you modified and click on "New Commit Message" in the VS Code interface.
+
+4. **Select the Best Message**: Browse through the list of generated commit messages and choose the one that best describes your changes.
+
+5. **Commit Your Changes**: Click "Yes" to commit your changes with the selected commit message. Your commit is now well-documented and ready to push to your Git repository.
+
 
 ## Support and Feedback
 
