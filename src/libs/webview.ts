@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { generateMessage, openAITest } from './openai';
+import { addAllFiles, autoCommit } from './sourceControl';
 
 export default class AutomitCommitView implements vscode.WebviewViewProvider {
 
@@ -53,10 +54,16 @@ export default class AutomitCommitView implements vscode.WebviewViewProvider {
 				case 'messageSelected':
 					{
 						// notification that a message was selected
-						vscode.window.showInformationMessage(`Message selected: ${data.value}`);
-						// let terminal = vscode.window.activeTerminal;
-						// terminal?.sendText(`git commit -m "${data.value}"`);
-						// terminal?.show();
+						// vscode.window.showInformationMessage(`Message selected: ${data.value}`);
+						
+						// show opetion to commit with message
+						vscode.window.showInformationMessage(`Commit with message: ${data.value}`, 'Yes', 'No').then((value) => {
+							if (value === 'Yes') {
+								addAllFiles();
+								autoCommit(data.value);
+							}
+						}
+						);
 						break;
 					}
 					break;

@@ -120,6 +120,13 @@ export function addAllFiles() {
 export function autoCommit(message: string) {
   // Get the currently active text editor
   const editor = vscode.window.activeTextEditor;
+  let terminal;
+  if(vscode.window.activeTerminal){
+    terminal = vscode.window.activeTerminal;
+  }
+  else{
+    terminal = vscode.window.createTerminal('Git Commit');
+  }
  
   if (editor) {
     // Check if the current file is saved
@@ -130,7 +137,6 @@ export function autoCommit(message: string) {
 
     // Get the file's URI and open a terminal
     const fileUri = editor.document.uri;
-    const terminal = vscode.window.createTerminal('Git Commit');
 
     // Run the Git commit command in the terminal
     // terminal.sendText(`git commit -m "Auto commit: ${fileUri.fsPath}"`);
