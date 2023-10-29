@@ -8,20 +8,20 @@
 
   const oldState = vscode.getState() || { colors: [] };
 
-  /** @type {Array<{ value: string }>} */
+  /** @type {Array<{ value: string , selected: boolean}>} */
   let colors = oldState.colors;
 
-  updateColorList(colors);
+  updateMessagesList(colors);
 
   // @ts-ignore
-  document.querySelector('.add-color-button').addEventListener('click', () => {
+  document.querySelector('.commit-message-button').addEventListener('click', () => {
     requestNewMessage();
   });
 
   // @ts-ignore
-  document.querySelector('.clear-colors-button').addEventListener('click', () => {
+  document.querySelector('.clear-messages-button').addEventListener('click', () => {
     colors = [];
-    updateColorList(colors);
+    updateMessagesList(colors);
   });
 
   // Handle messages sent from the extension to the webview
@@ -30,13 +30,13 @@
     switch (message.type) {
       case 'newMessage':
         {
-          addColor(message.value);
+          addMessage(message.value);
           break;
         }
       case 'clearMessages':
         {
           colors = [];
-          updateColorList(colors);
+          updateMessagesList(colors);
           break;
         }
 
@@ -44,34 +44,31 @@
   });
 
   /**
-   * @param {Array<{ value: string }>} messages
+   * @param {Array<{ value: string , selected: boolean}>} messages
    */
-  function updateColorList(messages) {
+  function updateMessagesList(messages) {
     const ul = document.querySelector('.message-list');
     // @ts-ignore
     ul.textContent = '';
     for (const message of messages) {
       const li = document.createElement('li');
       li.className = 'message-entry';
-      li.addEventListener('click', () => {
+      li.addEventListener('click', (el) => {
         onMessageClicked(message.value);
-      });
+        //get all the li elements
+        const lis = document.querySelectorAll('.message-entry');
+        //remove the selected class from each
+        lis.forEach((li) => {
+          li.classList.remove('selected');
+        });
+        //add the selected class to the clicked li
+        li.classList.toggle('selected');
+      1});
 
-      const input = document.createElement('input');
+      const input = document.createElement('p');
       input.className = 'message-input';
-      input.type = 'text';
-      input.value = message.value;
-      input.addEventListener('change', (e) => {
-        // @ts-ignore
-        const value = e.target.value;
-        if (!value) {
-          // Treat empty value as delete
-          messages.splice(messages.indexOf(message), 1);
-        } else {
-          message.value = value;
-        }
-        updateColorList(messages);
-      });
+      input.innerHTML = message.value;
+      
       li.appendChild(input);
 
       // @ts-ignore
@@ -99,10 +96,10 @@
     return colors[Math.floor(Math.random() * colors.length)];
   }
 
-  function addColor(m = 'test') {
+  function addMessage(m = 'test') {
     // request new message to vscode etension
-    colors.push({ value: m });
-    updateColorList(colors);
+    colors.push({ value: m , selected: false});
+    updateMessagesList(colors);
   }
 
   function requestNewMessage() {

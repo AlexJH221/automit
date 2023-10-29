@@ -49,10 +49,14 @@ export default class AutomitCommitView implements vscode.WebviewViewProvider {
 						// vscode.window.showInformationMessage(`New message requested: ${message}`);
 						this._view?.webview.postMessage({ type: 'newMessage', value: message });
 					}
+					break;
 				case 'messageSelected':
 					{
 						// notification that a message was selected
 						vscode.window.showInformationMessage(`Message selected: ${data.value}`);
+						// let terminal = vscode.window.activeTerminal;
+						// terminal?.sendText(`git commit -m "${data.value}"`);
+						// terminal?.show();
 						break;
 					}
 					break;
@@ -104,7 +108,7 @@ export default class AutomitCommitView implements vscode.WebviewViewProvider {
         </ul>
 
         <button class="commit-message-button">Commit Message</button>
-        <button class="clear-messages-button_">Clear Messages</button>
+        <button class="clear-messages-button">Clear Messages</button>
 
 
         <script nonce="${nonce}" src="${scriptUri}"></script>
