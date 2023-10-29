@@ -114,7 +114,7 @@ export default class AutomitCommitView implements vscode.WebviewViewProvider {
         <ul class="message-list">
         </ul>
 
-        <button class="commit-message-button">Commit Message</button>
+        <button class="commit-message-button">New Commit Message</button>
         <button class="clear-messages-button">Clear Messages</button>
 
 
